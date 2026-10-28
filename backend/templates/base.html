@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} · FileGuard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-page="{{ active_page }}">
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="brand">
+      <span class="brand-icon"><i class="fa-solid fa-shield-halved"></i></span>
+      <div>
+        <div class="brand-name">FILEGUARD</div>
+        <div class="brand-sub">File Integrity Monitor</div>
+      </div>
+    </div>
+
+    {% set nav = [
+      ('dashboard', 'Dashboard',            'fa-gauge-high'),
+      ('register',  'Register File',        'fa-file-circle-plus'),
+      ('verify',    'Verify File',          'fa-file-shield'),
+      ('files',     'File Registry',        'fa-database'),
+      ('history',   'Verification History', 'fa-clock-rotate-left')
+    ] %}
+    <nav class="nav">
+      {% for key, label, icon in nav %}
+      <a class="nav-link {{ 'active' if active_page == key }}" href="{{ url_for(key) }}"
+         {% if active_page == key %}aria-current="page"{% endif %}>
+        <i class="fa-solid {{ icon }}"></i><span>{{ label }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="sys-box">
+        <div class="sys-label">SYSTEM STATUS</div>
+        <div class="sys-state" id="sysState"><span class="dot dot--ok pulse"></span>Monitoring Active</div>
+      </div>
+      <div class="version">Version 1.0.0</div>
+    </div>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
+      <div class="topbar-title">
+        <h1>{{ page_title }}</h1>
+        <p>{{ page_subtitle }}</p>
+      </div>
+      <div class="sys-pill" id="sysPill"><span class="dot dot--ok"></span>System Secure</div>
+    </header>
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <strong>FILEGUARD</strong> · File Integrity &amp; Tampering Detection System
+      <span class="tagline">Protecting File Integrity Through Cryptographic Verification</span>
+    </footer>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

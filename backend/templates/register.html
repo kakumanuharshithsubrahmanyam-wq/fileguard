@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% set active_page = 'register' %}
+{% set page_title = 'Register File' %}
+{% set page_subtitle = 'Create a secure SHA-256 fingerprint for a file.' %}
+
+{% block content %}
+<div id="registerForm">
+  <div class="banner banner--info">
+    <i class="fa-solid fa-circle-info"></i>
+    <p>FileGuard stores only the cryptographic fingerprint and file metadata. Your original file is not permanently stored.</p>
+  </div>
+
+  <section class="card">
+    <div class="card-body">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose a file to register">
+        <input type="file" id="fileInput" hidden>
+        <i class="fa-solid fa-cloud-arrow-up dz-icon"></i>
+        <h3>Drop your file here</h3>
+        <p class="muted">or</p>
+        <button type="button" class="btn btn--outline" data-browse><i class="fa-solid fa-folder-open"></i>Browse Files</button>
+        <p class="hint">Any file type • Maximum size 50 MB</p>
+      </div>
+
+      <div class="file-preview" id="filePreview" hidden>
+        <span class="fp-icon"><i class="fa-solid fa-file" id="fpIcon"></i></span>
+        <div class="fp-info">
+          <div class="fp-name" id="fpName">internship_report.pdf</div>
+          <div class="fp-meta" id="fpMeta">PDF Document • 2.4 MB</div>
+        </div>
+        <button type="button" class="icon-btn" id="fpRemove" data-tip="Remove file" aria-label="Remove file"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn--primary" id="registerBtn"><i class="fa-solid fa-fingerprint"></i><span>Register File</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>HOW FILE REGISTRATION WORKS</h2></div>
+    <div class="card-body steps">
+      <div class="step"><span class="step-num">1</span><div><h4>Select File</h4><p>Choose the file you want to protect.</p></div></div>
+      <i class="fa-solid fa-arrow-right step-arrow"></i>
+      <div class="step"><span class="step-num">2</span><div><h4>Generate Fingerprint</h4><p>FileGuard generates a SHA-256 cryptographic fingerprint.</p></div></div>
+      <i class="fa-solid fa-arrow-right step-arrow"></i>
+      <div class="step"><span class="step-num">3</span><div><h4>Secure Registration</h4><p>The fingerprint and metadata are stored for future verification.</p></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading state (shown while "hashing") -->
+<section class="card loading-panel" id="loadingPanel" hidden>
+  <div class="spinner"></div>
+  <h3>Generating SHA-256 Fingerprint...</h3>
+  <p class="muted">Reading file contents and computing the cryptographic hash.</p>
+</section>
+
+<!-- ===== Success state (hidden until registration completes) =====
+     FLASK: render this block from the API response (file_id, filename, size, sha256, registered_at). -->
+<section id="registerSuccess" hidden>
+  <div class="result result--ok">
+    <div class="result-head">
+      <span class="result-icon"><i class="fa-solid fa-circle-check"></i></span>
+      <h2>FILE REGISTERED SUCCESSFULLY</h2>
+      <p class="muted" id="rsSubtitle">A secure fingerprint has been created for this file.</p>
+      <p class="muted small" id="rsDuplicateNote" hidden>This exact file is already registered. Existing integrity record loaded.</p>
+    </div>
+
+    <dl class="kv">
+      <div><dt>File ID</dt><dd class="mono" id="rsId">—</dd></div>
+      <div><dt>Filename</dt><dd id="rsName">—</dd></div>
+      <div><dt>File Size</dt><dd id="rsSize">—</dd></div>
+      <div><dt>Algorithm</dt><dd>SHA-256</dd></div>
+      <div><dt>Registered</dt><dd id="rsDate">—</dd></div>
+    </dl>
+
+    <div class="hash-block">
+      <div class="hash-label">SHA-256 FINGERPRINT</div>
+      <div class="hash" id="rsHash" data-hash=""></div>
+    </div>
+
+    <div class="actions actions--center">
+      <button type="button" class="btn btn--outline" data-copy="#rsHash"><i class="fa-regular fa-copy"></i><span>Copy Hash</span></button>
+      <a class="btn btn--primary" href="{{ url_for('verify') }}"><i class="fa-solid fa-file-shield"></i>Verify This File</a>
+      <button type="button" class="btn btn--ghost" id="registerAnother">Register Another File</button>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% set active_page = 'files' %}
+{% set page_title = 'File Details' %}
+{% set page_subtitle = 'Registered metadata, fingerprint and verification history for a single file.' %}
+
+{% block content %}
+<a class="back-link" href="{{ url_for('files') }}"><i class="fa-solid fa-arrow-left"></i> Back to File Registry</a>
+
+<div id="detailsContent" data-file-id="{{ file_id }}">
+<section class="card status-card status-card--ok" id="statusCard">
+  <div class="status-card-icon"><i class="fa-solid fa-circle-check" id="statusIcon"></i></div>
+  <div>
+    <div class="stat-label">FILE INTEGRITY STATUS</div>
+    <div class="status-big" id="statusText">NOT CHECKED</div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>FILE INFORMATION</h2></div>
+  <div class="card-body">
+    <dl class="kv kv--grid">
+      <div><dt>File ID</dt><dd class="mono" data-f="id">—</dd></div>
+      <div><dt>Filename</dt><dd data-f="name">—</dd></div>
+      <div><dt>File Type</dt><dd data-f="type">—</dd></div>
+      <div><dt>File Size</dt><dd data-f="size">—</dd></div>
+      <div><dt>Registered</dt><dd data-f="reg">—</dd></div>
+      <div><dt>Verification Attempts</dt><dd data-f="attempts">0</dd></div>
+      <div><dt>Last Verified</dt><dd data-f="last">—</dd></div>
+    </dl>
+    <div class="hash-block">
+      <div class="hash-label"><span>SHA-256 FINGERPRINT</span></div>
+      <div class="hash" id="detailHash" data-hash=""></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn--outline" data-copy="#detailHash"><i class="fa-regular fa-copy"></i><span>Copy Hash</span></button>
+      <a class="btn btn--primary" href="{{ url_for('verify') }}"><i class="fa-solid fa-file-shield"></i>Verify This File</a>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>VERIFICATION HISTORY</h2></div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Date</th><th>Hash Result</th><th>Status</th></tr></thead>
+      <tbody id="detailHistory"></tbody>
+    </table>
+    <div class="empty-state" id="detailHistoryEmpty" hidden>
+      <p class="muted">No verification attempts for this file yet.</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="card" id="detailsNotFound" hidden>
+  <div class="card-body empty-state">
+    <i class="fa-regular fa-file-circle-xmark"></i>
+    <h3>File record not found.</h3>
+    <p class="muted">The File ID may be invalid or the registration was removed.</p>
+    <a class="btn btn--outline" href="{{ url_for('files') }}">Back to File Registry</a>
+  </div>
+</section>
+{% endblock %}

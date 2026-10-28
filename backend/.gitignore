@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+.DS_Store
+.env
+
+# Runtime SQLite (schema is recreated by init_db() on startup if missing).
+fileguard.db

@@ -1,0 +1,11 @@
+# Render Blueprint — FileGuard (free web service).
+# Manual setup works without this file; see backend/README.md.
+services:
+  - type: web
+    name: fileguard
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/health

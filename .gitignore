@@ -1,0 +1,23 @@
+# Python / virtual environments
+backend/venv/
+venv/
+__pycache__/
+backend/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Secrets and local env
+.env
+.env.*
+
+# OS and logs
+.DS_Store
+*.log
+
+# SQLite runtime database (schema recreated on startup)
+backend/fileguard.db
+fileguard.db
+
+# Archived frontend copy (integrated UI lives in backend/templates and backend/static)
+frontend.zip

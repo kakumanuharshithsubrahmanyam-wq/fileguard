@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+{% set page_title = 'Security Dashboard' %}
+{% set page_subtitle = 'Monitor file integrity and detect unauthorized modifications.' %}
+
+{% block content %}
+<section class="stats">
+  <article class="card stat">
+    <div class="stat-icon stat-icon--blue"><i class="fa-solid fa-folder-open"></i></div>
+    <div>
+      <div class="stat-label">TOTAL FILES</div>
+      <div class="stat-value" id="dashTotalFiles">0</div>
+      <div class="stat-note">Registered Files</div>
+    </div>
+  </article>
+  <article class="card stat stat--ok">
+    <div class="stat-icon stat-icon--green"><i class="fa-solid fa-circle-check"></i></div>
+    <div>
+      <div class="stat-label">VERIFIED</div>
+      <div class="stat-value text-ok" id="dashVerified">0</div>
+      <div class="stat-note">Integrity Confirmed</div>
+    </div>
+  </article>
+  <article class="card stat stat--bad">
+    <div class="stat-icon stat-icon--red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div>
+      <div class="stat-label">TAMPERING DETECTED</div>
+      <div class="stat-value text-bad" id="dashTampered">0</div>
+      <div class="stat-note">Security Alerts</div>
+    </div>
+  </article>
+  <article class="card stat">
+    <div class="stat-icon stat-icon--slate"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+    <div>
+      <div class="stat-label">VERIFICATIONS</div>
+      <div class="stat-value" id="dashVerifications">0</div>
+      <div class="stat-note">Total Scans</div>
+    </div>
+  </article>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>INTEGRITY OVERVIEW</h2><span class="muted small" id="dashOverviewLabel">0 registered files</span></div>
+  <div class="card-body">
+    <div class="meter" id="dashMeter" role="img" aria-label="Integrity overview">
+      <span class="meter-seg bg-ok" id="meterVerified" style="width:0%"></span>
+      <span class="meter-seg bg-bad" id="meterTampered" style="width:0%"></span>
+      <span class="meter-seg bg-muted" id="meterOther" style="width:0%"></span>
+    </div>
+    <ul class="legend" id="dashLegend">
+      <li><span class="dot dot--ok"></span><strong id="pctVerified">0%</strong> Verified <em id="legendVerified">0 checks</em></li>
+      <li><span class="dot dot--bad"></span><strong id="pctTampered">0%</strong> Tampered <em id="legendTampered">0 checks</em></li>
+      <li><span class="dot dot--muted"></span><strong id="pctOther">0%</strong> Not Registered <em id="legendOther">0 checks</em></li>
+    </ul>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>RECENT SECURITY ACTIVITY</h2></div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>File</th><th>Action</th><th>Status</th><th>Date &amp; Time</th></tr></thead>
+      <tbody id="dashActivityBody"></tbody>
+    </table>
+    <div class="empty-state" id="dashActivityEmpty" hidden>
+      <i class="fa-regular fa-clock"></i>
+      <h3>No security activity yet.</h3>
+      <p class="muted">Register a file or run a verification to see activity here.</p>
+    </div>
+  </div>
+  <div class="card-foot"><a class="link" href="{{ url_for('history') }}">View All Activity →</a></div>
+</section>
+{% endblock %}

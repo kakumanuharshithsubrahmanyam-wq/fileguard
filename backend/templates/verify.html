@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% set active_page = 'verify' %}
+{% set page_title = 'Verify File Integrity' %}
+{% set page_subtitle = 'Check whether a registered file has been modified.' %}
+
+{% block content %}
+
+<div id="verifyForm">
+  <section class="card">
+    <div class="card-body">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose a file to verify">
+        <input type="file" id="fileInput" hidden>
+        <i class="fa-solid fa-file-shield dz-icon"></i>
+        <h3>Drop a file to verify its integrity</h3>
+        <p class="muted">or</p>
+        <button type="button" class="btn btn--outline" data-browse><i class="fa-solid fa-folder-open"></i>Browse Files</button>
+        <p class="hint">Any file type • Maximum size 50 MB</p>
+      </div>
+
+      <div class="file-preview" id="filePreview" hidden>
+        <span class="fp-icon"><i class="fa-solid fa-file" id="fpIcon"></i></span>
+        <div class="fp-info">
+          <div class="fp-name" id="fpName"></div>
+          <div class="fp-meta" id="fpMeta"></div>
+        </div>
+        <button type="button" class="icon-btn" id="fpRemove" data-tip="Remove file" aria-label="Remove file"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn--primary" id="verifyBtn"><i class="fa-solid fa-shield-halved"></i><span>Verify Integrity</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>WHAT HAPPENS DURING VERIFICATION?</h2></div>
+    <div class="card-body flow">
+      <div class="flow-step"><i class="fa-solid fa-file"></i><span>Current File</span></div>
+      <i class="fa-solid fa-arrow-down flow-arrow"></i>
+      <div class="flow-step"><i class="fa-solid fa-fingerprint"></i><span>SHA-256 Fingerprint</span></div>
+      <i class="fa-solid fa-arrow-down flow-arrow"></i>
+      <div class="flow-step"><i class="fa-solid fa-code-compare"></i><span>Compare with Registered Fingerprint</span></div>
+      <i class="fa-solid fa-arrow-down flow-arrow"></i>
+      <div class="flow-step flow-step--end"><i class="fa-solid fa-clipboard-check"></i><span>Integrity Result</span></div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading state -->
+<section class="card loading-panel" id="loadingPanel" hidden>
+  <div class="spinner"></div>
+  <h3>Analyzing File Integrity...</h3>
+  <p class="muted">Calculating SHA-256 fingerprint and comparing against registered record.</p>
+</section>
+
+<!-- ============ RESULTS (all hidden until shown by JS) ============ -->
+<div id="verifyResults" hidden>
+
+  <!-- ---- VERIFIED ---- -->
+  <section class="result result--ok" id="res-verified" hidden>
+    <div class="result-head">
+      <span class="result-icon"><i class="fa-solid fa-shield-check"></i></span>
+      <h2>FILE VERIFIED</h2>
+      <div class="status-line">Integrity Status <span class="badge badge--ok badge--lg">INTACT</span></div>
+      <p class="result-text">The SHA-256 fingerprint of this file matches the originally registered fingerprint. No modification has been detected.</p>
+    </div>
+
+    <dl class="kv">
+      <div><dt>Filename</dt><dd data-fname id="vOkName">—</dd></div>
+      <div><dt>File ID</dt><dd class="mono" id="vOkFileId">—</dd></div>
+      <div><dt>Verification ID</dt><dd class="mono" id="vOkVerId">—</dd></div>
+      <div><dt>Registered</dt><dd id="vOkRegistered">—</dd></div>
+      <div><dt>Verified</dt><dd id="vOkVerified">—</dd></div>
+    </dl>
+
+    <div class="hash-grid">
+      <div class="hash-block hash-block--ok">
+        <div class="hash-label"><span>STORED SHA-256</span><i class="fa-solid fa-circle-check text-ok"></i></div>
+        <div class="hash" id="vOkStored" data-hash=""></div>
+      </div>
+      <div class="hash-block hash-block--ok">
+        <div class="hash-label"><span>CURRENT SHA-256</span><i class="fa-solid fa-circle-check text-ok"></i></div>
+        <div class="hash" id="vOkCurrent" data-hash=""></div>
+      </div>
+    </div>
+
+    <div class="result-foot result-foot--ok">
+      <strong><i class="fa-solid fa-check"></i> HASH MATCH</strong><span>No changes detected.</span>
+    </div>
+    <div class="actions actions--center">
+      <a class="btn btn--outline" id="vOkViewRecord" href="{{ url_for('files') }}">View Original Record</a>
+      <button type="button" class="btn btn--primary" data-reset>Verify Another File</button>
+    </div>
+  </section>
+
+  <!-- ---- TAMPERED ---- -->
+  <section class="result result--bad" id="res-tampered" hidden>
+    <div class="result-head">
+      <span class="result-icon"><i class="fa-solid fa-shield-xmark"></i></span>
+      <h2>FILE TAMPERING DETECTED</h2>
+      <div class="status-line">Integrity Status <span class="badge badge--bad badge--lg">COMPROMISED</span></div>
+      <p class="result-text">The current SHA-256 fingerprint does not match the originally registered fingerprint. This indicates that the file contents have changed since registration.</p>
+    </div>
+
+    <div class="alert alert--bad">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div>
+        <strong>SECURITY WARNING</strong>
+        <p>File integrity cannot be verified. Do not trust this file until the modification has been investigated.</p>
+      </div>
+    </div>
+
+    <dl class="kv">
+      <div><dt>Filename</dt><dd data-fname id="vBadName">—</dd></div>
+      <div><dt>File ID</dt><dd class="mono" id="vBadFileId">—</dd></div>
+      <div><dt>Verification ID</dt><dd class="mono" id="vBadVerId">—</dd></div>
+      <div><dt>Registered</dt><dd id="vBadRegistered">—</dd></div>
+      <div><dt>Verified</dt><dd id="vBadVerified">—</dd></div>
+    </dl>
+
+    <div class="hash-grid">
+      <div class="hash-block hash-block--ok">
+        <div class="hash-label"><span>STORED SHA-256</span><i class="fa-solid fa-lock text-ok"></i></div>
+        <div class="hash" id="vBadStored" data-hash="" data-diff-against=""></div>
+      </div>
+      <div class="hash-block hash-block--bad">
+        <div class="hash-label"><span>CURRENT SHA-256</span><i class="fa-solid fa-circle-xmark text-bad"></i></div>
+        <div class="hash" id="vBadCurrent" data-hash="" data-diff-against=""></div>
+      </div>
+    </div>
+    <p class="legend-note"><mark class="diff">Highlighted characters</mark> differ from the stored fingerprint.</p>
+
+    <div class="result-foot result-foot--bad">
+      <strong><i class="fa-solid fa-xmark"></i> HASH MISMATCH</strong><span>File modification detected.</span>
+    </div>
+    <div class="actions actions--center">
+      <a class="btn btn--outline" id="vBadViewRecord" href="{{ url_for('files') }}">View Original Record</a>
+      <button type="button" class="btn btn--primary" data-reset>Verify Another File</button>
+    </div>
+  </section>
+
+  <!-- ---- NOT REGISTERED ---- -->
+  <section class="result result--warn" id="res-unregistered" hidden>
+    <div class="result-head">
+      <span class="result-icon"><i class="fa-solid fa-file-circle-question"></i></span>
+      <h2>FILE NOT REGISTERED</h2>
+      <p class="result-text">No original fingerprint was found for this file.</p>
+    </div>
+    <dl class="kv">
+      <div><dt>Filename</dt><dd id="vUnregName">—</dd></div>
+      <div><dt>Verification ID</dt><dd class="mono" id="vUnregVerId">—</dd></div>
+      <div><dt>Verified</dt><dd id="vUnregVerified">—</dd></div>
+    </dl>
+    <div class="hash-block">
+      <div class="hash-label">CURRENT SHA-256 FINGERPRINT</div>
+      <div class="hash" id="vUnregHash" data-hash=""></div>
+    </div>
+    <div class="alert alert--warn">
+      <i class="fa-solid fa-circle-info"></i>
+      <div>
+        <strong>Nothing to compare against</strong>
+        <p>Integrity can only be verified for files that were registered first. Register this file to create a baseline fingerprint.</p>
+      </div>
+    </div>
+    <div class="actions actions--center">
+      <a class="btn btn--primary" href="{{ url_for('register') }}"><i class="fa-solid fa-file-circle-plus"></i>Register This File</a>
+      <button type="button" class="btn btn--outline" data-reset>Try Another File</button>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

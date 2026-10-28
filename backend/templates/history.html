@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% set active_page = 'history' %}
+{% set page_title = 'Verification History' %}
+{% set page_subtitle = 'Review previous file-integrity checks.' %}
+
+{% block content %}
+<section class="stats stats--3">
+  <article class="card stat">
+    <div class="stat-icon stat-icon--blue"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+    <div><div class="stat-label">TOTAL VERIFICATIONS</div><div class="stat-value" id="histTotal">0</div></div>
+  </article>
+  <article class="card stat stat--ok">
+    <div class="stat-icon stat-icon--green"><i class="fa-solid fa-circle-check"></i></div>
+    <div><div class="stat-label">SUCCESSFUL</div><div class="stat-value text-ok" id="histVerified">0</div></div>
+  </article>
+  <article class="card stat stat--bad">
+    <div class="stat-icon stat-icon--red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div><div class="stat-label">TAMPERING DETECTED</div><div class="stat-value text-bad" id="histTampered">0</div></div>
+  </article>
+</section>
+
+<section class="card">
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Filter by result">
+      <button type="button" class="seg-btn active" data-history-filter="all">All</button>
+      <button type="button" class="seg-btn" data-history-filter="VERIFIED">Verified</button>
+      <button type="button" class="seg-btn" data-history-filter="TAMPERED">Tampered</button>
+      <button type="button" class="seg-btn" data-history-filter="NOT_REGISTERED">Not Registered</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="table" id="historyTable">
+      <thead><tr><th>Verification ID</th><th>File</th><th>File ID</th><th>Result</th><th>Date &amp; Time</th><th>Action</th></tr></thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+    <div class="empty-state" id="historyEmpty" hidden>
+      <i class="fa-regular fa-clock"></i>
+      <h3>No verification activity yet.</h3>
+      <p class="muted">Verify a registered file to build an integrity history.</p>
+    </div>
+  </div>
+  <div class="pagination-bar">
+    <span class="muted small" id="historyCount">Showing 0 of 0 verifications</span>
+    <nav class="pagination" id="historyPagination" aria-label="Pagination" hidden></nav>
+  </div>
+</section>
+{% endblock %}

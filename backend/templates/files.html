@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% set active_page = 'files' %}
+{% set page_title = 'File Registry' %}
+{% set page_subtitle = 'Manage files protected by FileGuard.' %}
+
+{% block content %}
+<section class="card">
+  <div class="toolbar">
+    <label class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" id="tableSearch" placeholder="Search by filename or File ID..." autocomplete="off">
+    </label>
+    <div class="seg" role="group" aria-label="Filter by status">
+      <button type="button" class="seg-btn active" data-filter="all">All Files</button>
+      <button type="button" class="seg-btn" data-filter="verified">Verified</button>
+      <button type="button" class="seg-btn" data-filter="tampered">Tampered</button>
+      <button type="button" class="seg-btn" data-filter="unchecked">Not Checked</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table" id="dataTable">
+      <thead><tr><th>File ID</th><th>Filename</th><th>Type</th><th>Size</th><th>SHA-256</th><th>Registered</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="registryBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyFilter" hidden>
+      <i class="fa-regular fa-folder-open"></i>
+      <h3>No matching files</h3>
+      <p class="muted">Try a different filename or File ID, or reset the filter.</p>
+    </div>
+    <div class="empty-state" id="emptyRegistry" hidden>
+      <i class="fa-regular fa-folder-open"></i>
+      <h3>No files have been registered yet.</h3>
+      <p class="muted">Register a file to create a SHA-256 fingerprint for future integrity checks.</p>
+      <a class="btn btn--primary" href="{{ url_for('register') }}"><i class="fa-solid fa-file-circle-plus"></i>Register Your First File</a>
+    </div>
+  </div>
+
+  <div class="pagination-bar">
+    <span class="muted small" id="rowCount">Showing 0 of 0 files</span>
+    <nav class="pagination" id="registryPagination" aria-label="Pagination" hidden></nav>
+  </div>
+</section>
+{% endblock %}
